@@ -109,7 +109,7 @@ The model calls `vslm_predict` under the hood, gets back the relevant sentences,
 
 ```bash
 uv venv
-uv pip install -e ".[dev]"
+uv pip install -e .
 export ZQ_API_KEY="..."
 python -m zettaquant_vslm_mcp
 ```
@@ -126,8 +126,8 @@ npx @modelcontextprotocol/inspector uvx zettaquant-vslm-mcp
 
 - **"ZQ_API_KEY is not set"** in the host logs → the `env` block in your MCP config didn't propagate. Confirm the config file path and restart the host.
 - **401 in tool output** → key is valid but wrong. Try it directly: `curl -H "x-api-key: $ZQ_API_KEY" https://api.zettaquant.ai/v1/usage/me`.
-- **403 SCOPE_DENIED** → your key doesn't have the `vslm` scope. Contact ZettaQuant.
-- **429 QUOTA_EXCEEDED** → you hit your per-period cap; the error message includes the reset time.
+- **`ZettaQuant access denied (403)`** → your key doesn't have the `vslm` scope. Contact ZettaQuant.
+- **`ZettaQuant quota exceeded (429)`** → you hit your per-period cap; the error message includes the reset time.
 
 ---
 
