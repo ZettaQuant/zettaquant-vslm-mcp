@@ -1,11 +1,11 @@
 """
-zettaquant-vslm-mcp — MCP server for ZettaQuant V-SLM.
+zettaquant-vslm-mcp - MCP server for ZettaQuant V-SLM.
 
 Exposes one tool over stdio to any MCP-aware host (Claude Desktop, Cursor,
 Zed, Windsurf, ChatGPT dev mode):
 
   - vslm_predict   Filter sentences to only those relevant to a topic.
-                   Always uses the general_context_agent — broad-domain,
+                   Always uses the general_context_agent, broad-domain,
                    works across financial text, transcripts, news, reports,
                    and beyond.
 
@@ -85,7 +85,7 @@ def _friendly_http_error(exc: httpx.HTTPStatusError) -> RuntimeError:
     elif status == 429:
         msg = (
             f"ZettaQuant quota exceeded (429). "
-            f"{body.get('message', '')} — quota resets at {body.get('resets_at', 'next period')}."
+            f"{body.get('message', '')}; quota resets at {body.get('resets_at', 'next period')}."
         )
     elif status in (502, 503):
         msg = f"ZettaQuant upstream temporarily unavailable ({status}); retry later."
@@ -102,7 +102,7 @@ async def vslm_predict(
     """Filter a list of sentences to only those relevant to `query`.
 
     Use this BEFORE feeding noisy context (earnings-call transcripts, news
-    articles, long reports, log lines) to an LLM — it typically cuts token
+    articles, long reports, log lines) to an LLM; it typically cuts token
     spend without losing important context. Chain it with your own language model.
 
     Args:
