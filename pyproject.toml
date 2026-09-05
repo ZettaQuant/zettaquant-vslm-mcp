@@ -1,0 +1,41 @@
+[project]
+name = "zettaquant-vslm-mcp"
+version = "0.1.1"
+description = "MCP server that exposes ZettaQuant V-SLM (topic-conditioned sentence relevancy) to any MCP-aware LLM host — Claude Desktop, Cursor, Zed, Windsurf."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [
+  { name = "ZettaQuant", email = "support@zettaquant.ai" }
+]
+keywords = ["mcp", "model-context-protocol", "vslm", "zettaquant", "llm", "tools", "claude", "cursor"]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Topic :: Software Development :: Libraries",
+]
+dependencies = [
+  "mcp>=1.2.0,<2",
+  "httpx>=0.27.0",
+]
+
+[project.scripts]
+zettaquant-vslm-mcp = "zettaquant_vslm_mcp.server:main"
+
+[project.urls]
+Homepage = "https://zettaquant.ai"
+Documentation = "https://github.com/zettaquant/zettaquant-vslm-mcp"
+Source = "https://github.com/zettaquant/zettaquant-vslm-mcp"
+Issues = "https://github.com/zettaquant/zettaquant-vslm-mcp/issues"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/zettaquant_vslm_mcp"]
