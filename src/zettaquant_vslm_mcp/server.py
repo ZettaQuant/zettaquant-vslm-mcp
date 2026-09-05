@@ -4,7 +4,7 @@ zettaquant-vslm-mcp — MCP server for ZettaQuant V-SLM.
 Exposes one tool over stdio to any MCP-aware host (Claude Desktop, Cursor,
 Zed, Windsurf, ChatGPT dev mode):
 
-  • vslm_predict   Filter sentences to only those relevant to a topic.
+  - vslm_predict   Filter sentences to only those relevant to a topic.
                    Always uses the general_context_agent — broad-domain,
                    works across financial text, transcripts, news, reports,
                    and beyond.
@@ -39,15 +39,9 @@ from mcp.server.fastmcp import FastMCP
 ZQ_BASE_URL = os.environ.get("ZQ_BASE_URL", "https://api.zettaquant.ai").rstrip("/")
 ZQ_API_KEY = os.environ.get("ZQ_API_KEY", "")
 
-# The only agent this MCP server exposes. Broad-domain V-SLM head; works
-# across financial text, transcripts, news, reports, logs. We intentionally
-# do NOT expose the domain-specialised agents (transcript, log, legal, etc.)
-# to keep the tool surface minimal for the LLM.
+# The only ZQ "agent" this MCP server exposes.
 VSLM_AGENT = "general_context_agent"
 
-# Bail loudly rather than fail mysteriously on first tool call. The host
-# surfaces stderr in its logs, giving the user a clear "set ZQ_API_KEY"
-# signal instead of an opaque "tool call returned 401".
 if not ZQ_API_KEY:
     print(
         "zettaquant-vslm-mcp: ZQ_API_KEY environment variable is not set.\n"
@@ -55,16 +49,10 @@ if not ZQ_API_KEY:
         "  claude_desktop_config.json under mcpServers.<name>.env.ZQ_API_KEY.",
         file=sys.stderr,
     )
-    # Do NOT exit(1) — some hosts start the server before the first tool
-    # call and would treat an immediate exit as a crash loop. We surface
-    # the error per tool call instead (see _require_key below).
 
-_HTTP_TIMEOUT_S = 120.0  # V-SLM predict can take a while on ~2K-sentence batches.
+_HTTP_TIMEOUT_S = 120.0
 
 mcp = FastMCP("zettaquant-vslm")
-
-
-# ---------------- helpers ----------------
 
 
 def _require_key() -> None:
@@ -106,9 +94,6 @@ def _friendly_http_error(exc: httpx.HTTPStatusError) -> RuntimeError:
     return RuntimeError(msg)
 
 
-# ---------------- tools ----------------
-
-
 @mcp.tool()
 async def vslm_predict(
     sentences: list[str],
@@ -118,8 +103,7 @@ async def vslm_predict(
 
     Use this BEFORE feeding noisy context (earnings-call transcripts, news
     articles, long reports, log lines) to an LLM — it typically cuts token
-    count 5-10x without losing signal. Chain it with your own model, or with
-    a ZettaQuant classifier.
+    spend without losing important context. Chain it with your own language model.
 
     Args:
         sentences: raw input sentences; ~2000 per call is comfortable.
@@ -159,11 +143,8 @@ async def vslm_predict(
         return r.json()
 
 
-# ---------------- entrypoint ----------------
-
-
 def main() -> None:
-    """Console-script entrypoint. Runs stdio transport (default for FastMCP)."""
+    """Console-script entrypoint. Runs stdio transport."""
     mcp.run()
 
 
