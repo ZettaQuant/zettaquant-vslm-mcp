@@ -1,4 +1,62 @@
-# zettaquant-vslm-mcp
+# Kolmo custom decision models MCP (private beta)
+
+Train a private classifier from your own text and label definitions, then classify new text with it from any MCP client. `kolmo-mcp` runs locally over stdio and calls the ZettaQuant API, where training and inference run.
+
+**Access is invitation-only.** [Request access by email](mailto:contact@zettaquant.ai?subject=Kolmo%20custom%20models%20beta%20access) with your account email, organization, use case and expected volume. Once approved, create a **My models: training and inference** key at [API Keys](https://app.zettaquant.ai/keys).
+
+## Setup
+
+Add this to your MCP client's configuration:
+
+```json
+{
+  "mcpServers": {
+    "kolmo-custom-models": {
+      "command": "uvx",
+      "args": ["--from", "zettaquant-vslm-mcp==0.2.0b1", "kolmo-mcp"],
+      "env": { "ZQ_MODEL_API_KEY": "YOUR_APPROVED_KEY" }
+    }
+  }
+}
+```
+
+To run from a checkout instead, use `"command": "uv"` with `"args": ["run", "--directory", "/path/to/zettaquant-vslm-mcp", "kolmo-mcp"]`.
+
+## Tools
+
+| Tool | What it does |
+|---|---|
+| `kolmo_beta_access` | Setup guidance and a prefilled email link to request access. |
+| `kolmo_list_models` | Ready models available to your account, with versions and labels. |
+| `kolmo_train_model` | Starts training from label definitions and representative text. |
+| `kolmo_model_status` | Training progress, or the version of a ready model. |
+| `kolmo_cancel_training` | Cancels a training run. |
+| `kolmo_classify` | Up to 128 texts; one label, score and probabilities per text. Text longer than the model's 256-token window is split and the pieces are averaged by length. |
+| `kolmo_classify_documents` | Long documents; one label per chunk, with character offsets into the original text. |
+
+## Training data
+
+- Supply 2–24 labels, each with an `id` (lowercase, up to 32 characters), a `name` and a `description` that says when it applies. Include an `other` label if some inputs fit none of them.
+- Supply at least about 150 distinct, representative text pieces covering every label. The API accepts as few as ten, but that is too few to learn from.
+- Give each source document its own `document_id` and keep that document's pieces under it. The API splits long text and holds out whole documents for evaluation.
+- A `ready` model can still be poor. Classify held-out examples for every label before relying on it.
+- Identical training inputs reuse one idempotency key, so retrying recovers the same run. Pass a new `request_id` to train again on the same data.
+
+## Limits
+
+Requests are capped at 16 MiB. Each training text allows 2,000,000 characters and each `kolmo_classify` text 4,000. Document inference returns at most 128 chunks per call. Beta rate limits apply, and a 429 includes retry guidance when available.
+
+## Access and data handling
+
+The API checks your invitation, key scopes, account state and model ownership on every request. The adapter reads only `ZQ_MODEL_API_KEY`. Keys belong to one user and organization, so use your own. Set `ZQ_MODELS_BASE_URL` only for a trusted HTTPS ZettaQuant deployment; the default is `https://app.zettaquant.ai`.
+
+Submitted text goes to ZettaQuant, and training also sends it to ZettaQuant's labeling providers. Your MCP host may keep tool arguments and results under its own settings. Error messages never include API responses, your key or your text.
+
+A container image is also available: `docker build -f Dockerfile.kolmo -t kolmo-mcp .` then `docker run --rm -i -e ZQ_MODEL_API_KEY kolmo-mcp`.
+
+---
+
+# zettaquant-vslm-mcp (context filtering)
 
 **MCP server that exposes ZettaQuant V-SLM to any MCP-aware LLM host.**
 
@@ -111,7 +169,7 @@ The model calls `vslm_predict` under the hood, gets back the relevant sentences,
 uv venv
 uv pip install -e .
 export ZQ_API_KEY="..."
-python -m zettaquant_vslm_mcp
+python -m zettaquant_vslm_mcp.server
 ```
 
 The server speaks JSON-RPC on stdin/stdout. To poke it manually, use the [MCP Inspector](https://github.com/modelcontextprotocol/inspector):

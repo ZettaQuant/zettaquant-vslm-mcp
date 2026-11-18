@@ -31,3 +31,6 @@ Thumbs.db
 .env
 .env.*
 !.env.example
+
+# Local-only tests and live smoke fixtures (not published)
+tests/

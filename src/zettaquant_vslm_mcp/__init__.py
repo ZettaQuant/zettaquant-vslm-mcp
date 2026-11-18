@@ -1,3 +1,3 @@
-"""ZettaQuant V-SLM MCP server — exposes topic-conditioned sentence relevancy to any MCP host."""
+"""ZettaQuant MCP entry points for context filtering and beta custom decision models."""
 
-__version__ = "0.1.0"
+__version__ = "0.2.0b1"
