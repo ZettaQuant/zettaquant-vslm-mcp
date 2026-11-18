@@ -1,7 +1,7 @@
 [project]
 name = "zettaquant-vslm-mcp"
-version = "0.1.1"
-description = "MCP server that exposes ZettaQuant V-SLM (topic-conditioned sentence relevancy) to any MCP-aware LLM host — Claude Desktop, Cursor, Zed, Windsurf."
+version = "0.2.0b2"
+description = "Kolmo beta custom model training and inference, plus ZettaQuant context filtering, for MCP clients."
 readme = "README.md"
 requires-python = ">=3.10"
 license = { text = "MIT" }
@@ -20,11 +20,13 @@ classifiers = [
   "Topic :: Software Development :: Libraries",
 ]
 dependencies = [
-  "mcp>=1.2.0,<2",
-  "httpx>=0.27.0",
+  "mcp>=1.28.1,<2",
+  "httpx>=0.28.1,<1",
+  "pydantic>=2.11,<3",
 ]
 
 [project.scripts]
+kolmo-mcp = "zettaquant_vslm_mcp.kolmo:main"
 zettaquant-vslm-mcp = "zettaquant_vslm_mcp.server:main"
 
 [project.urls]
@@ -39,3 +41,6 @@ build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/zettaquant_vslm_mcp"]
+
+[tool.hatch.build.targets.sdist]
+include = ["/src", "/README.md", "/SETUP.md", "/LICENSE", "/pyproject.toml", "/glama.json", "/Dockerfile", "/Dockerfile.kolmo"]

@@ -27,7 +27,10 @@ env/
 .DS_Store
 Thumbs.db
 
-# Secrets — never commit
+# Secrets, never commit
 .env
 .env.*
 !.env.example
+
+# Local-only tests and live smoke fixtures (not published)
+tests/

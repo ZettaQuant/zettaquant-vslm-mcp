@@ -12,3 +12,10 @@ __pycache__/
 .ruff_cache/
 .mypy_cache/
 .DS_Store
+
+# Credentials and private runtime artifacts
+.env
+.env.*
+*.pem
+*.key
+output/
